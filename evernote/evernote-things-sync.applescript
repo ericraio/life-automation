@@ -2,21 +2,21 @@
 -- WHAT IT DOES
 -- There are only 2 things I really need for an effective mobile GTD solution
 -- (1) An ability to very quickly add a task or idea using my Android phone
--- (2) A way to review my "Next" items using my Android
+-- (2) A way to review my "Upcoming" items using my Android
 -- Additionally (of course) it all needs to sync up with my Mac, via the cloud.
 -- The script uses Evernote to achieve a 2 way "sync":
 -- Firstly, it establishes an Evernote "Inbox"
 -- and creates a Things to do for any note in there that was created using an Android device
--- Secondly, it reads the "Next" list from Things and maintains an Evernote note that matches that list
+-- Secondly, it reads the "Upcoming" list from Things and maintains an Evernote note that matches that list
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- NOTES
--- * The script is saves as an application. It keeps running all the time once you launch it. 
+-- * The script is saves as an application. It keeps running all the time once you launch it.
 --    It's totally open, so you can open it with an applescript editor and make any changes you like (see licence below).
 -- * I find it best to make the "Inbox" notebook the default notebook for Evernote.
--- * On first launch, 2 notebooks will be ceated in Evernote. 
---    ".Inbox" (for collected tasks and ideas) and 
---    ".Next" (where the review list will be maintained)
+-- * On first launch, 2 notebooks will be ceated in Evernote.
+--    ".Inbox" (for collected tasks and ideas) and
+--    ".Upcoming" (where the review list will be maintained)
 --    This can't be done with Applescript, so just right click the notebook and choose "Notebook settings"
 --    This will be the default insertion point for all your notes, even those made on the Mac
 --    but only those that originally came from the Android phone will be made into Things To Dos
@@ -56,26 +56,34 @@ on syncToDos()
 	tell application "Evernote Legacy"
 
 		-- create inbox if required
-		if (not («class EVnb» named ".Inbox" exists)) then
+    if (not (notebook named ".Inbox" exists)) then
 			activate
-			delay 60
+      #delay 60
 			try
-				make «class EVnb» with properties {name:".Inbox"}
+        create notebook ".Inbox"
 			end try
 		end if
 
 		-- create reference notebook if required
-		if (not («class EVnb» named ".Reference" exists)) then
+    if (not (notebook named ".Reference" exists)) then
 			activate
-			delay 60
+      #delay 60
 			try
-				make «class EVnb» with properties {name:".Reference"}
+        create notebook ".Reference"
+			end try
+		end if
+		-- create reference notebook if required
+    if (not (notebook named ".Reference" exists)) then
+			activate
+      #delay 60
+			try
+        create notebook ".Reference"
 			end try
 		end if
 
 		-- create to do ref tag if required
 		if (not («class EVtg» named "ToDoRef" exists)) then
-			make «class EVtg» with properties {name:"ToDoRef"}
+      make tag "ToDoRef"
 		end if
 
 		-- loop all notes in the "INBOX" that were created on an ios device
@@ -112,7 +120,7 @@ on syncToDos()
 				if (length of attachmentList) > 0 then
 					set evNoteText to "[url=" & «class EV24» of evInboxNote & "]" & «class EV24» of evInboxNote & "[/url]" & crlf & crlf & evNoteText
 					tell application "Things3" to make new to do with properties {name:evNoteTitle, notes:evNoteText} at beginning of list "Inbox"
-					move evInboxNote to «class EVnb» ".Reference"
+					move evInboxNote to notebook ".Reference"
 					«event EVRNassn» «class EVtg» "ToDoRef" given «class EV13»:evInboxNote
 				else
 					tell application "Things3" to make new to do with properties {name:evNoteTitle, notes:evNoteText} at beginning of list "Inbox"
@@ -130,29 +138,29 @@ on syncToDos()
 
 	--========================================================--
 	-- THINGS TO EVERNOTE
-	-- Now take all the "Next" items in Things
+	-- Now take all the "Upcoming" items in Things
 	-- and turn them into a nicely formatted note for Evernote, that can be viewed on Android 
 	--========================================================--
 
 	tell application "Things3"
 
-		-- loop all the notes in the "Next" list of Things
+		-- loop all the notes in the "Upcoming" list of Things
 		set theArea to "anUnlikelyString"
-		set theNextText to ""
+		set theUpcomingText to ""
 
 		-- first, sync back any unmanaged "Inbox" items
-		set theNextText to theNextText & "<div><br /></div><div><b>INBOX</b></div>"
+		set theUpcomingText to theUpcomingText & "<div><br /></div><div><b>INBOX</b></div>"
 		repeat with theTodo in (to dos in the list "Inbox")
 			if the status of theTodo is open then
-				set theNextText to theNextText & "<div><font class='Apple-style-span' color='#D90408'>" & the name of theTodo & "</font></div>"
+				set theUpcomingText to theUpcomingText & "<div><font class='Apple-style-span' color='#D90408'>" & the name of theTodo & "</font></div>"
 			end if
 		end repeat
 
 		-- put in a horizontal line
-		set theNextText to theNextText & "</br></br><hr>"
+		set theUpcomingText to theUpcomingText & "</br></br><hr>"
 
 		-- now, grab all the "today" stuff
-		set theNextText to theNextText & "<div><br /></div><div><b>TODAY</b></div>"
+		set theUpcomingText to theUpcomingText & "<div><br /></div><div><b>TODAY</b></div>"
 		repeat with theTodo in (to dos in the list "Today")
 			if the status of theTodo is open then
 				-- get the name of the area or project this to do belongs to
@@ -164,18 +172,18 @@ on syncToDos()
 						set theToDoArea to the name of the project of theTodo
 					end try
 				end try
-				set theNextText to theNextText & "<div><font class='Apple-style-span' color='#008f29'>" & "<strong>" & theToDoArea & " - </strong>" & the name of theTodo & "</font></div>"
+				set theUpcomingText to theUpcomingText & "<div><font class='Apple-style-span' color='#008f29'>" & "<strong>" & theToDoArea & " - </strong>" & the name of theTodo & "</font></div>"
 			end if
 		end repeat
 
 		-- put in a horizontal line
-		set theNextText to theNextText & "</br></br><hr>"
+		set theUpcomingText to theUpcomingText & "</br></br><hr>"
 
 		-- now do the "next" list
-		repeat with theTodo in (to dos in the list "Next")
+		repeat with theTodo in (to dos in the list "Upcoming")
 
 			-- get the name of the area or project this to do belongs to
-			set theToDoArea to "General"
+			set theToDoArea to "Today"
 			try
 				set theToDoArea to the name of the area of theTodo
 			on error
@@ -190,7 +198,7 @@ on syncToDos()
 				-- find unique areas and projects, and make bold headings
 				if theToDoArea is not equal to theArea then
 					set theArea to theToDoArea
-					set theNextText to theNextText & "<div><br /></div><div><b>" & theToDoArea & "</b></div>"
+					set theUpcomingText to theUpcomingText & "<div><br /></div><div><b>" & theToDoArea & "</b></div>"
 				end if
 
 				set theDate to the activation date of theTodo as string
@@ -199,17 +207,17 @@ on syncToDos()
 					set theNow to word 2 of theNow & word 3 of theNow & word 4 of theNow
 					set theDate to word 2 of theDate & word 3 of theDate & word 4 of theDate
 					if theNow is equal to theDate then
-						set theNextText to theNextText & "<div><font class='Apple-style-span' color='#008f29'>" & the name of theTodo & "</font></div>"
+						set theUpcomingText to theUpcomingText & "<div><font class='Apple-style-span' color='#008f29'>" & the name of theTodo & "</font></div>"
 					else
-						set theNextText to theNextText & "<div>" & the name of theTodo & "</div>"
+						set theUpcomingText to theUpcomingText & "<div>" & the name of theTodo & "</div>"
 					end if
 				else
 					-- break this out into a "people list" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					set theContact to the contact of theTodo
 					try
-						set theNextText to theNextText & "<div><strong>" & the name of theContact & "</strong> - " & the name of theTodo & "</div>"
+						set theUpcomingText to theUpcomingText & "<div><strong>" & the name of theContact & "</strong> - " & the name of theTodo & "</div>"
 					on error
-						set theNextText to theNextText & "<div>" & the name of theTodo & "</div>"
+						set theUpcomingText to theUpcomingText & "<div>" & the name of theTodo & "</div>"
 
 					end try
 				end if
@@ -217,30 +225,30 @@ on syncToDos()
 		end repeat
 	end tell
 
-	tell application "Evernote"
+	tell application "Evernote Legacy"
 
-		-- look for the "Next Notebook. Make it if it's not found
+		-- look for the "Upcoming Notebook. Make it if it's not found
 		set noteFound to 0
-		if (not («class EVnb» named ".Next" exists)) then
+    if (not (notebook named ".Upcoming" exists)) then
 			activate
-			make «class EVnb» with properties {name:".Next"}
+			make «class EVnb» with properties {name:".Upcoming"}
 		else
-			-- look for the "Next Note"
-			repeat with evInboxNote in «event EVRNfind» "notebook:.Next"
-				if the «class EVet» of evInboxNote is "GTD Next" then
+			-- look for the "Upcoming Note"
+			repeat with evInboxNote in «event EVRNfind» "notebook:.Upcoming"
+				if the «class EVet» of evInboxNote is "GTD Upcoming" then
 					set noteFound to 1
-					set theGTDNextNote to evInboxNote
+					set theGTDUpcomingNote to evInboxNote
 				end if
 			end repeat
 		end if
 
-		-- if we don't find the "Next Note", then make it from scratch. Otherwise, update the one we have with the Things list text
+		-- if we don't find the "Upcoming Note", then make it from scratch. Otherwise, update the one we have with the Things list text
 		if noteFound = 0 then
-			set theGTDNextNote to «event EVRNcrnt» given «class Entt»:"GTD Next", «class Enhl»:theNextText, «class Ennb»:".Next"
+			set theGTDUpcomingNote to «event EVRNcrnt» given «class Entt»:"GTD Upcoming", «class Enhl»:theUpcomingText, «class Ennb»:".Upcoming"
 		else
-			--set theTXT to the HTML content of theGTDNextNote
+			--set theTXT to the HTML content of theGTDUpcomingNote
 			--set the clipboard to theTXT
-			set «class EVhl» of item 1 of theGTDNextNote to theNextText
+			set «class EVhl» of item 1 of theGTDUpcomingNote to theUpcomingText
     end if
 	end tell
 
@@ -251,12 +259,6 @@ end syncToDos
 --========================================================--
 
 on idle
-	syncToDos()
-	return 60
+        syncToDos()
+        return 60
 end idle
-
-
-
-
-
-
