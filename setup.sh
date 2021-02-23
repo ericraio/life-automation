@@ -2,12 +2,13 @@
 
 mkdir -p ~/.config/scripts/
 
-mv evernote/evernote-things-sync.applescript ~/.config/scripts/evernote-things-sync.applescript
+cp evernote/evernote-things-sync.applescript ~/.config/scripts/evernote-things-sync.applescript
 
-./mac/apps/install-alfred4.sh
-./mac/apps/install-things3.sh
-./mac/apps/install-vanilla.sh
-./mac/apps/install-rocket.sh
+./dev/install-nodejs.sh
+./dev/install-vim.sh
+./dev/setup-brew.sh
+
+./mac/setup-mac.sh
 
 #write out current crontab
 crontab -l > evernote-cron
@@ -16,3 +17,8 @@ echo "* * * * *  osascript ~/.config/scripts/evernote-things-sync.applescript" >
 #install new cron file
 crontab evernote-cron
 rm evernote-cron
+
+# End
+killall Dock
+killall Finder
+sudo reboot

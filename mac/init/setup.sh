@@ -323,7 +323,6 @@ if $setup_fonts; then
 fi
 
 
-
 if $upgrade_bash; then
   prompt "Upgrade bash"
   brew install bash
