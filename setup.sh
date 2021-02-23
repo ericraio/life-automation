@@ -6,6 +6,7 @@ mv evernote/evernote-things-sync.applescript ~/.config/scripts/evernote-things-s
 
 ./mac/apps/install-alfred4.sh
 ./mac/apps/install-things3.sh
+./mac/apps/install-vanilla.sh
 
 #write out current crontab
 crontab -l > evernote-cron
