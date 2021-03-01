@@ -4,6 +4,8 @@
 
 brew install mas
 
+absolute_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+
 mac_apps=(
   595191960  # CopyClip
   288545208  # Instapaper
@@ -32,7 +34,7 @@ echo "Mac applications"
 mac_install ${mac_apps[@]}
 
 ./mac/apps/install-alfred4.sh
-./mac/apps/install-things3.sh
+./mac/apps/install-things3-helper.sh
 ./mac/apps/install-vanilla.sh
 ./mac/apps/install-rocket.sh
 
@@ -44,6 +46,10 @@ chflags nohidden ~/Library
 
 # Show path in finder
 defaults write com.apple.finder ShowPathbar -bool true
+
+## Enable key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+osascript $absolute_path/scripts/create-keyboard-task.applescript
 
 # Install Command Line Tools without Xcode
 # xcode-select --install
