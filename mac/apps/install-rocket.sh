@@ -7,6 +7,8 @@ if [ ! -d "/Applications/Rocket.app/" ]; then
           sudo cp -R /Volumes/Rocket/Rocket.app /Applications/
           sudo hdiutil detach /Volumes/Rocket
         popd
-fi
 
-#TODO Create applescript to create todo in Things to Add License
+        ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+
+        osascript $ABSOLUTE_PATH/scripts/create-rocket-task.applescript
+fi

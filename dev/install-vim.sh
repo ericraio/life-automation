@@ -17,3 +17,4 @@ ln -s $ABSOLUTE_PATH/nvim/coc-settings.json /Users/$(whoami)/.config/nvim/coc-se
 
 # TODO: setup applescript to create to-dos in Things 3
 # echo ":CocInstall coc-json coc-tsserver"
+# https://github.com/normen/vim-macos-scripts

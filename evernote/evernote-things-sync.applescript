@@ -128,9 +128,13 @@ on syncToDos()
 				end if
 
 			on error
-				-- just let us know if it didn't work, otherwise carry on
-				tell me to activate
-				display alert ("Evernote/Things Sync Failed")
+        tell application "Mail"
+                set msg to make new outgoing message
+                set subject of msg to "Evernote/Things Sync Failed"
+                set content of msg to "Evernote/Things Sync Failed"
+                set sender of msg to "ericraio@Eric-Raio-Macbook-Pro.local"
+                send msg
+        end tell
 			end try
 		end repeat
 

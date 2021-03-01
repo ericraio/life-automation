@@ -8,6 +8,7 @@ if [ ! -d "/Applications/Vanilla.app/" ]; then
           sudo hdiutil detach /Volumes/Vanilla
         popd
 
-        #TODO Create applescript to create todo in Things to Add License
-fi
+        ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
 
+        osascript $ABSOLUTE_PATH/scripts/create-vanilla-task.applescript
+fi
