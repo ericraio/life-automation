@@ -7,8 +7,11 @@ if [ ! -d "/Applications/Alfred 4.app/" ]; then
           sudo cp -R /Volumes/Alfred/Alfred\ 4.app /Applications/
           sudo hdiutil detach /Volumes/Alfred
         popd
+
+        ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+
+        osascript $ABSOLUTE_PATH/scripts/create-alfred-task.applescript
 fi
 
 #TODO:
-# Create applescript to create todo in Things to Add License
 # Create monthly cron to check alfred
