@@ -37,7 +37,7 @@ mac_install ${mac_apps[@]}
 ./mac/apps/install-things3-helper.sh
 ./mac/apps/install-vanilla.sh
 ./mac/apps/install-rocket.sh
-
+./mac/apps/install-fluid.sh
 
 # https://github.com/cflorion/macOS-install-script/blob/184a5a115326bb405fb401c6e16804bdd9ad1ce4/installConfig.sh
 
